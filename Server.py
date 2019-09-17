@@ -42,8 +42,10 @@ class Server():
             if not msg_queue.empty():
                 msg = self.get_msg(msg_queue)
                 data = '>>>>>来自id:{}的消息:{}'.format(str(msg[0]), str(msg[2]))
-                client_dict[str(msg[1])].send(data.encode('utf8'))
-
+                lock.acquire()
+                cli = client_dict[str(msg[1])][1]
+                lock.release()
+                cli.send(data.encode('utf8'))
 
     def get_msg(self, _queue):
         lock.acquire()
@@ -62,20 +64,25 @@ class Client(threading.Thread):
         global client_dict
         global id
         data = self.clientsocket.recv(1024)
-        if data == 'No id':
-            msg = '你的id是:{}'.format(str(id))
+        if data.decode('utf-8') == ('No id'):
             id += 1
-            self.clientsocket.send(msg.encode('utf8'))
+            self.clientsocket.send(str(id).encode('utf8'))
             self.username = self.clientsocket.recv(1024)
+            lock.acquire()
             client_dict[self.username] = [self.address, self.clientsocket]
+            lock.release()
         else:
-            self.username = str(data)
+            self.username = data.decode('utf-8')
+            lock.acquire()
+            client_dict[self.username] = [self.address, self.clientsocket]
+            lock.release()
 
 
     def run(self):
+        print('{}is online !'.format(self.username))
         while True:
             data = self.clientsocket.recv(1024)
-            msg = self.username + ',' + data
+            msg = self.username + ',' + data.decode('utf-8')
             self.append(msg)
 
 
@@ -87,8 +94,8 @@ class Client(threading.Thread):
 
 def main():
     server = Server(9999)
-    t1 = threading.Thread(target=server.run())
-    t2 = threading.Thread(target=server._recv())
+    t1 = threading.Thread(target=server.run)
+    t2 = threading.Thread(target=server._recv)
     t1.start()
     t2.start()
 
