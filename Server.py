@@ -24,6 +24,7 @@ class Server():
         global client_dict
         global msg_queue
 
+
     def run(self):
         while True:
             clientsocket, address = self.serversocket.accept()
@@ -35,12 +36,14 @@ class Server():
             except socket.timeout:
                 print("Client Connection Timeout !")
 
+
     def _recv(self):
         while True:
             if not msg_queue.empty():
                 msg = self.get_msg(msg_queue)
                 data = '>>>>>来自id:{}的消息:{}'.format(str(msg[0]), str(msg[2]))
                 client_dict[str(msg[1])].send(data.encode('utf8'))
+
 
     def get_msg(self, _queue):
         lock.acquire()
@@ -68,11 +71,13 @@ class Client(threading.Thread):
         else:
             self.username = str(data)
 
+
     def run(self):
         while True:
             data = self.clientsocket.recv(1024)
             msg = self.username + ',' + data
             self.append(msg)
+
 
     def append(self, data):
         lock.acquire()
