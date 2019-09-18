@@ -5,7 +5,7 @@
 import socket
 import os
 import threading
-import time
+
 threadlist = []
 
 class Client():
@@ -32,29 +32,31 @@ class Client():
 
     def _send(self):
         while True:
-            target = input(">>>>>>to").strip()
-            line = input(">>>>>>say:").strip()
-            msg = target + ',' + line
-            self.socket.send(msg.encode('utf-8'))
-
-
-    def to_stop(self):
-        global threadlist
-        while True:
             if not self.stop:
-                time.sleep(0.5)
+                target = input(">>>>>>to").strip()
+                line = input(">>>>>>say:").strip()
+                msg = target + ',' + line
+                self.socket.send(msg.encode('utf-8'))
             else:
-                for i in threadlist:
-                    i.join()
+                break
+
 
     def _recv(self):
         while True:
-            data = self.socket.recv(1024)
-            if data.decode('utf-8') != 'logout success':
-                print('>>>>{}\n'.format(data.decode('utf-8')))
+            if not self.stop:
+                data = self.socket.recv(1024)
+                if data.decode('utf-8') != 'logout success':
+                    print('>>>>{}\n'.format(data.decode('utf-8')))
+                else:
+                    self.stop = True
             else:
-                self.stop = True
+                break
 
+
+def stop ():
+    global threadlist
+    for i in threadlist:
+        i.join()
 
 
 def main():
@@ -62,13 +64,12 @@ def main():
     client = Client()
     t1 = threading.Thread(target=client._send)
     t2 = threading.Thread(target=client._recv)
-    t3 = threading.Thread(target=client.to_stop)
     threadlist.append(t1)
     threadlist.append(t2)
-    threadlist.append(t3)
     for i in threadlist:
         i.start()
 
 
 if __name__ == '__main__':
     main()
+    stop()
