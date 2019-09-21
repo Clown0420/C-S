@@ -62,7 +62,11 @@ class Client:
 
 
 def main():
-    C = Client()
+    try:
+        C = Client()
+    except Exception:
+        print('Connect is Refused !!!')
+        return
     try:
         t1 = threading.Thread(target=C._send)
         t2 = threading.Thread(target=C._recv)
