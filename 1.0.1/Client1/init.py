@@ -8,6 +8,7 @@ import threading
 from conf import *
 import signal
 
+
 class Client:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -10,7 +10,6 @@ import time
 import signal
 import os
 
-id = -1
 # 在线用户列表
 user_list = []
 # 用户对应的信息
@@ -86,17 +85,21 @@ class Client(threading.Thread):
         global user_list
         global client_list
         global msg_list
-        global id
         global flag
+        f = open('db.txt','r')
+        id = int(f.read())
+        f.close()
         data = self.clientsocket.recv(1024)
         # 分发id
         if data.decode('utf-8') == ('Noid'):
-            id += 1
             self.clientsocket.send(str(id).encode('utf8'))
-            self.username = id
+            self.username = str(id)
             lock.acquire()
             client_list[self.username] = [self.address, self.clientsocket]
             lock.release()
+            f= open('db.txt','w')
+            f.write(str(int(id)+1))
+            f.close()
         else:
             self.username = data.decode('utf-8')
             lock.acquire()
