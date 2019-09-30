@@ -3,9 +3,20 @@
 # Author: icanfly
 
 import socket
-import os
+import os, time
 import threading
 from conf import *
+import signal
+import sys
+
+
+def Quit(signum, frame):
+    print('Quit TEST\n')
+    sys.exit()
+
+
+signal.signal(signal.SIGINT, Quit)
+signal.signal(signal.SIGTERM, Quit)
 
 
 class Client:
@@ -48,7 +59,6 @@ class Client:
             else:
                 print('请不要给自己发送信息')
 
-
     def _recv(self):
         while self.flag.is_set():
             data = self.socket.recv(1024)
@@ -77,5 +87,12 @@ def main():
         return
 
 
+def quit(signum, frame):
+    print('Stopping...')
+    time.sleep(1)
+    os._exit(0)
+
+
 if __name__ == '__main__':
     main()
+    signal.signal(signal.SIGINT, quit)

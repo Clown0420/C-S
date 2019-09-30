@@ -6,6 +6,9 @@ import socket
 import threading
 from queue import Queue
 from conf import *
+import time
+import signal
+import os
 
 id = -1
 # 在线用户列表
@@ -15,11 +18,13 @@ client_list = dict()
 # 消息队列
 msg_list = Queue()
 lock = threading.Lock()
+flag = False
 
 
 def minitor():
     global msg_list, says
     global client_list
+    global flag
     while True:
         if not msg_list.empty():
             msg = get_msg(msg_list)
@@ -59,7 +64,7 @@ class Server(threading.Thread):
         self.serversocket.bind((host, port))
         self.serversocket.listen(max_connections)
         print("ServerSocket Started !")
-        global id, user_list, client_list, msg_list
+        global id, user_list, client_list, msg_list, flag
 
     def run(self):
         while True:
@@ -82,6 +87,7 @@ class Client(threading.Thread):
         global client_list
         global msg_list
         global id
+        global flag
         data = self.clientsocket.recv(1024)
         # 分发id
         if data.decode('utf-8') == ('Noid'):
@@ -140,5 +146,12 @@ def main():
     t2.start()
 
 
+def quit(signum, frame):
+    print('Stopping...')
+    time.sleep(1)
+    os._exit(0)
+
+
 if __name__ == '__main__':
     main()
+    signal.signal(signal.SIGINT, quit)
