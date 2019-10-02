@@ -31,6 +31,7 @@ class Client:
             line = f.read()
             self.socket.send(str(line).encode('utf-8'))
             self.username = str(line)
+            print('id{}:登陆成功'.format(self.username))
 
     def _send(self):
         while True:

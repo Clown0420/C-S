@@ -8,6 +8,7 @@ import threading
 from conf import *
 import signal
 
+
 class Client:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,6 +31,7 @@ class Client:
             line = f.read()
             self.socket.send(str(line).encode('utf-8'))
             self.username = str(line)
+            print('id {}:登陆成功'.format(self.username))
 
     def _send(self):
         while True:

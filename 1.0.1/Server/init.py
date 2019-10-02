@@ -86,7 +86,7 @@ class Client(threading.Thread):
         global client_list
         global msg_list
         global flag
-        f = open('db.txt','r')
+        f = open('db.txt', 'r')
         id = int(f.read())
         f.close()
         data = self.clientsocket.recv(1024)
@@ -97,8 +97,8 @@ class Client(threading.Thread):
             lock.acquire()
             client_list[self.username] = [self.address, self.clientsocket]
             lock.release()
-            f= open('db.txt','w')
-            f.write(str(int(id)+1))
+            f = open('db.txt', 'w')
+            f.write(str(int(id) + 1))
             f.close()
         else:
             self.username = data.decode('utf-8')
